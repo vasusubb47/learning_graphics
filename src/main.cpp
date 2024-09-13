@@ -1,42 +1,61 @@
 #include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <iostream>
 
-int main(void)
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+int main()
 {
-    // 
-    if (!glfwInit())
-        return -1;
+    // we first initialize GLFW
+    glfwInit();
+    // configure GLFW
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    GLFWwindow* window = window = glfwCreateWindow(640, 480, "learning graphics", NULL, NULL);
-    if (!window) {
+    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
-
     glfwMakeContextCurrent(window);
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    glfwSwapInterval(1);
 
-	while (!glfwWindowShouldClose(window))
-	{
-		int width = 0, height = 0;
+    // GLAD manages function pointers for OpenGL 
+    // so we want to initialize GLAD before we call any OpenGL function
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+    
+    // telling OpenGL Window size for rendering
+    // first 2 parms set the location of lower left corner in window
+    // next 2 parms sets window width and height
+    glViewport(0, 0, 800, 600);
 
-		glfwGetFramebufferSize(window, &width, &height);
-		glViewport(0, 0, width, height);
-		glClear(GL_COLOR_BUFFER_BIT);
+    // resize the viewport of OpenGL when window resizes
+    // by setting a callback
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-		//I'm using the old pipeline here just to test, you shouldn't learn this,
-		//Also It might not work on apple
-		glBegin(GL_TRIANGLES);
-		glVertex2f(0, 1);
-		glVertex2f(1, -1);
-		glVertex2f(-1, -1);
-		glEnd();
+    // setting loop so the window will not immediately close
+    while (!glfwWindowShouldClose(window))
+    {
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+    // deleting all the glfw allocated resources
+    glfwTerminate();
 
     return 0;
+}
+
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
 }
